@@ -2,3 +2,8 @@ VPATH += keyboards/gboards
 
 RGBLIGHT_ENABLE = no
 COMBO_ENABLE = yes
+
+POINTING_DEVICE_ENABLE = yes
+POINTING_DEVICE_DRIVER = cirque_pinnacle_i2c
+
+CONSOLE_ENABLE = yes
