@@ -39,7 +39,6 @@ enum layers {
 enum custom_keycodes {
         VTERM_ON = SAFE_RANGE,
         VTERM_OFF,
-        TEST_STUFF,
         LYR_CLEAR,
         DRAG_SCROLL
 };
@@ -67,7 +66,7 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
-        case VTERM_OFF:
+        case VTERM_ON:
             if (record->event.pressed) {
                 register_code(KC_LCTL);
                 register_code(KC_LALT);
@@ -76,7 +75,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 unregister_code(KC_LALT);
             }
             break;
-        case TEST_STUFF:
+        case VTERM_OFF:
             if (record->event.pressed) {
                 register_code(KC_LCTL);
                 register_code(KC_LALT);
@@ -130,8 +129,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [UTIL] = LAYOUT(
         KC_F1,      KC_F2,    KC_F3,  KC_F4,  KC_F5,  KC_F6,    KC_F7,    KC_F8,    KC_F9,    KC_F10,   KC_F11,   KC_F12,
-        LYR_CLEAR,   KC_LCTL,     KC_LSFT,   KC_LGUI,   KC_LALT,   XXXXXXX,  XXXXXXX,  KC_LALT,  KC_LGUI,  KC_LSFT,  KC_LCTL,  VTERM_OFF,
-        XXXXXXX,    XXXXXXX,  XXXXXXX,   XXXXXXX,   XXXXXXX,   XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  TEST_STUFF,
+        LYR_CLEAR,   KC_LCTL,     KC_LSFT,   KC_LGUI,   KC_LALT,   XXXXXXX,  XXXXXXX,  KC_LALT,  KC_LGUI,  KC_LSFT,  KC_LCTL,  VTERM_ON,
+        XXXXXXX,    XXXXXXX,  XXXXXXX,   XXXXXXX,   XXXXXXX,   XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  VTERM_OFF,
                                 _______,  _______,  _______,  _______,  _______,  _______
     ),
     [MOUSE] = LAYOUT(
