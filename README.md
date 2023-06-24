@@ -1,4 +1,4 @@
-## Installation
+## QMK installation
 ```
 python3 -m pip install --user qmk
 ```
@@ -7,22 +7,15 @@ python3 -m pip install --user qmk
 git clone git@github.com:qmk/qmk_firmware.git
 ```
 
-After cloning QMK, clone this repo like so:
-```
-git clone git@github.com:kmazurek/qmk-keymap.git {qmk_path}/keyboards/crkbd/keymaps/kmazurek
-```
-
 ## Env setup
 ```
 qmk env
 ```
 
-## Compiling
+## Updating the repo
 ```
-qmk compile -kb crkbd -km kmazurek
+git pull --recurse-submodules
 ```
 
-## Flashing
-```
-qmk flash -kb crkbd -km kmazurek -bl dfu-split-left && qmk flash -kb crkbd -km kmazurek -bl avrdude-split-right
-```
+## Keymap importing
+After cloning the QMK main repository, use symlinking and flashing instructions in each of the hardware sub-directories of this repo.
