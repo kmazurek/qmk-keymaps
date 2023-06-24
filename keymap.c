@@ -4,9 +4,12 @@ enum layers {
     DEF,
     SYM,
     NAV,
+    MOUSE,
     UTIL,
 };
 
+#include <math.h>
+#include <stdlib.h>
 #include "g/keymap_combo.h"
 
 #define SYM_OS OSL(SYM)
@@ -36,12 +39,34 @@ enum layers {
 enum custom_keycodes {
         VTERM_ON = SAFE_RANGE,
         VTERM_OFF,
-        LYR_CLEAR
+        LYR_CLEAR,
+        DRAG_SCROLL
 };
+
+void pointing_device_init_user(void) {
+    set_auto_mouse_layer(MOUSE);
+    set_auto_mouse_enable(true);
+}
+
+bool set_scrolling = false;
+
+report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
+    if (set_scrolling) {
+        int8_t abs_x = abs(mouse_report.x);
+        int8_t abs_y = abs(mouse_report.y);
+        int8_t sign_x = mouse_report.x / abs_x;
+        int8_t sign_y = mouse_report.y / abs_y;
+        mouse_report.h = fmin(abs_x, 2) * sign_x;
+        mouse_report.v = -(fmin(abs_y, 2) * sign_y);
+        mouse_report.x = 0;
+        mouse_report.y = 0;
+    }
+    return mouse_report;
+}
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
-        case VTERM_OFF:
+        case VTERM_ON:
             if (record->event.pressed) {
                 register_code(KC_LCTL);
                 register_code(KC_LALT);
@@ -50,7 +75,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 unregister_code(KC_LALT);
             }
             break;
-        case TERM_OFF:
+        case VTERM_OFF:
             if (record->event.pressed) {
                 register_code(KC_LCTL);
                 register_code(KC_LALT);
@@ -62,6 +87,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case LYR_CLEAR:
             if (record->event.pressed) {
                 layer_clear();
+            }
+            break;
+        case DRAG_SCROLL:
+            if (record->event.pressed) {
+                set_scrolling = !set_scrolling;
             }
     }
     return true;
@@ -99,8 +129,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [UTIL] = LAYOUT(
         KC_F1,      KC_F2,    KC_F3,  KC_F4,  KC_F5,  KC_F6,    KC_F7,    KC_F8,    KC_F9,    KC_F10,   KC_F11,   KC_F12,
-        LYR_CLEAR,   KC_LCTL,     KC_LSFT,   KC_LGUI,   KC_LALT,   XXXXXXX,  XXXXXXX,  KC_LALT,  KC_LGUI,  KC_LSFT,  KC_LCTL,  VTERM_OFF,
-        XXXXXXX,    XXXXXXX,  XXXXXXX,   XXXXXXX,   XXXXXXX,   XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  TERM_OFF,
+        LYR_CLEAR,   KC_LCTL,     KC_LSFT,   KC_LGUI,   KC_LALT,   XXXXXXX,  XXXXXXX,  KC_LALT,  KC_LGUI,  KC_LSFT,  KC_LCTL,  VTERM_ON,
+        XXXXXXX,    XXXXXXX,  XXXXXXX,   XXXXXXX,   XXXXXXX,   XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  XXXXXXX,  VTERM_OFF,
                                 _______,  _______,  _______,  _______,  _______,  _______
+    ),
+    [MOUSE] = LAYOUT(
+        XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,        XXXXXXX,    KC_WBAK,    KC_WFWD,    XXXXXXX,    XXXXXXX,
+        XXXXXXX,    KC_LCTL,    KC_LSFT,    KC_LGUI,    KC_LALT,    XXXXXXX,    XXXXXXX,        KC_LALT,    KC_LGUI,    KC_LSFT,    KC_LCTL,    XXXXXXX,
+        DRAG_SCROLL,    XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,        XXXXXXX,    XXXXXXX,    XXXXXXX,    XXXXXXX,    DRAG_SCROLL,
+                                KC_BTN3,    KC_BTN2,    KC_BTN1,    KC_BTN1,    KC_BTN2,    KC_BTN3
     ),
 };
